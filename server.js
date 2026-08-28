@@ -1,32 +1,22 @@
 const express = require('express');
-const cors = require('cors');
-
+const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-app.use(cors());
-app.use(express.json());
+// Serve index.html and static files from root directory
+app.use(express.static(__dirname));
 
-// Simple In-Memory Data Store
-let books = [
-  { id: 1, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', status: 'Available' },
-  { id: 2, title: 'To Kill a Mockingbird', author: 'Harper Lee', status: 'Checked Out' }
-];
-
+// Send index.html when users visit the home page
 app.get('/', (req, res) => {
-  res.send('Library Management API is running live!');
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Book API Endpoint
 app.get('/api/books', (req, res) => {
-  res.json(books);
+  res.json([
+    { id: 1, title: "The Great Gatsby", author: "F. Scott Fitzgerald", status: "Available" },
+    { id: 2, title: "To Kill a Mockingbird", author: "Harper Lee", status: "Checked Out" }
+  ]);
 });
 
-app.post('/api/books', (req, res) => {
-  const newBook = { id: Date.now(), ...req.body };
-  books.push(newBook);
-  res.status(201).json(newBook);
-});
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

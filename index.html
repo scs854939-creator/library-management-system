@@ -1,13 +1,43 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>client</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Management System</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; }
+    h1 { color: #333; }
+    ul { list-style-type: none; padding: 0; }
+    li { background: #fff; margin: 8px 0; padding: 12px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .status { font-weight: bold; color: green; }
+  </style>
+</head>
+<body>
+  <h1>Library Book List</h1>
+  <ul id="book-list">Loading books...</ul>
+
+  <script>
+    const API_URL = '/api/books';
+
+    async function fetchBooks() {
+      try {
+        const response = await fetch(API_URL);
+        const books = await response.json();
+        
+        const listElement = document.getElementById('book-list');
+        listElement.innerHTML = '';
+        
+        books.forEach(book => {
+          const li = document.createElement('li');
+          li.innerHTML = `<strong>${book.title}</strong> by ${book.author} — <span class="status">${book.status}</span>`;
+          listElement.appendChild(li);
+        });
+      } catch (error) {
+        document.getElementById('book-list').innerText = 'Failed to load books.';
+      }
+    }
+
+    fetchBooks();
+  </script>
+</body>
 </html>
