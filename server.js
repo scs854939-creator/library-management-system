@@ -1,7 +1,5 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
-const { MongoMemoryServer } = require('mongodb-memory-server');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -9,30 +7,26 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Initialize MongoMemoryServer with compatible version 7.0.0 for Render (Debian 12)
-const startServer = async () => {
-  try {
-    const mongoServer = await MongoMemoryServer.create({
-      binary: {
-        version: '7.0.0'
-      }
-    });
+// Simple In-Memory Data Store
+let books = [
+  { id: 1, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', status: 'Available' },
+  { id: 2, title: 'To Kill a Mockingbird', author: 'Harper Lee', status: 'Checked Out' }
+];
 
-    const mongoUri = mongoServer.getUri();
-    await mongoose.connect(mongoUri);
-    console.log('Connected to In-Memory MongoDB');
+app.get('/', (req, res) => {
+  res.send('Library Management API is running live!');
+});
 
-    app.get('/', (req, res) => {
-      res.send('Library Management API is running...');
-    });
+app.get('/api/books', (req, res) => {
+  res.json(books);
+});
 
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  }
-};
+app.post('/api/books', (req, res) => {
+  const newBook = { id: Date.now(), ...req.body };
+  books.push(newBook);
+  res.status(201).json(newBook);
+});
 
-startServer();
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
